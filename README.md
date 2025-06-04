@@ -5,8 +5,9 @@ A simple loan time-line app in streamlit and fastapi
 108.181.190.57:8501
 
 # How to run
-git pull <project-name>
+git clone <project-url>
 cd into your project
+git pull origin main
 sudo docker compose up --build
 
 
