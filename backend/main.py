@@ -4,11 +4,13 @@ from typing import List
 
 app = FastAPI()
 
+
 class LoanDetails(BaseModel):
     principal: float
     rate1: float
     rate2: float
     period: int
+
 
 class AmortizationEntry(BaseModel):
     payment_number: int
@@ -17,11 +19,13 @@ class AmortizationEntry(BaseModel):
     interest_payment: float
     remaining_balance: float
 
+
 class LoanAmortizationResponse(BaseModel):
     total_payment_rate1: float
     total_payment_rate2: float
     amortization_schedule_rate1: List[AmortizationEntry]
     amortization_schedule_rate2: List[AmortizationEntry]
+
 
 def calculate_amortization(principal, annual_rate, period):
     r = annual_rate / 100 / 12
@@ -40,16 +44,21 @@ def calculate_amortization(principal, annual_rate, period):
         interest = balance * r
         principal_payment = monthly_payment - interest
         balance -= principal_payment
-        schedule.append(AmortizationEntry(
-            payment_number=i,
-            payment_amount=monthly_payment,
-            principal_payment=principal_payment,
-            interest_payment=interest,
-            remaining_balance=max(balance, 0)  # Ensure balance does not go negative
-        ))
+        schedule.append(
+            AmortizationEntry(
+                payment_number=i,
+                payment_amount=monthly_payment,
+                principal_payment=principal_payment,
+                interest_payment=interest,
+                remaining_balance=max(
+                    balance, 0
+                ),  # Ensure balance does not go negative
+            )
+        )
 
     total_payment = monthly_payment * n
     return total_payment, schedule
+
 
 @app.post("/calculate_loan", response_model=LoanAmortizationResponse)
 def calculate_loan(details: LoanDetails):
@@ -64,5 +73,5 @@ def calculate_loan(details: LoanDetails):
         total_payment_rate1=total_payment_rate1,
         total_payment_rate2=total_payment_rate2,
         amortization_schedule_rate1=schedule_rate1,
-        amortization_schedule_rate2=schedule_rate2
+        amortization_schedule_rate2=schedule_rate2,
     )
